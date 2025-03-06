@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AwesomeGIC.Domain", "Awesom
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AwesomeGIC.Infrastructure", "AwesomeGIC.Infrastructure\AwesomeGIC.Infrastructure.csproj", "{8C049F3E-CD54-4755-83BB-31A80E716CE6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AwesomeGIC.Tests", "AwesomeGIC.Tests\AwesomeGIC.Tests.csproj", "{D9B60C83-7496-42AB-8DCB-1DA359DC34E0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{8C049F3E-CD54-4755-83BB-31A80E716CE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C049F3E-CD54-4755-83BB-31A80E716CE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C049F3E-CD54-4755-83BB-31A80E716CE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9B60C83-7496-42AB-8DCB-1DA359DC34E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9B60C83-7496-42AB-8DCB-1DA359DC34E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9B60C83-7496-42AB-8DCB-1DA359DC34E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9B60C83-7496-42AB-8DCB-1DA359DC34E0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
