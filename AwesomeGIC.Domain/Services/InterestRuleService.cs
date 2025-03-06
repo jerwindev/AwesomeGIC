@@ -12,23 +12,37 @@ namespace AwesomeGIC.Domain.Services
             _interestRuleRepository = interestRuleRepository;
         }
 
-        public void AddInterestRule(InterestRule rule)
+        public void AddInterestRule(InterestRule interestRule)
         {
-            var rules = _interestRuleRepository.Find(x => x.Date == rule.Date);
+            Validate(interestRule);
+
+            var rules = _interestRuleRepository.Find(x => x.Date == interestRule.Date);
 
             if (rules != null && rules.Count() > 0)
             {
-                _interestRuleRepository.Update(rule);
+                _interestRuleRepository.Update(interestRule);
             }
             else
             {
-                _interestRuleRepository.Add(rule);
+                _interestRuleRepository.Add(interestRule);
             }
         }
 
         public IEnumerable<InterestRule> GetInterestRules()
         {
             return _interestRuleRepository.GetAll();
+        }
+
+        private void Validate(InterestRule interestRule)
+        {
+            if (string.IsNullOrEmpty(interestRule.RuleId))
+            {
+                throw new ApplicationException("Rule ID is required.");
+            }
+            else if (interestRule.Rate <= 0 || interestRule.Rate >= 100)
+            {
+                throw new ApplicationException("Interest rate should be greater than 0 and less than 100.");
+            }
         }
     }
 }

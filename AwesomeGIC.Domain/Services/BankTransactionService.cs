@@ -17,8 +17,8 @@ namespace AwesomeGIC.Domain.Services
 
         public void AddBankTransaction(BankTransaction bankTransaction)
         {
-            var lastTransaction = GetBankTransactions(bankTransaction.AccountNumber).LastOrDefault();
-            var runningBalance = lastTransaction.Balance;
+            var lastBankTransaction = GetBankTransactions(bankTransaction.AccountNumber).LastOrDefault();
+            var runningBalance = lastBankTransaction.Balance;
 
             if (bankTransaction.Type == 'D')
             {
@@ -28,6 +28,8 @@ namespace AwesomeGIC.Domain.Services
             {
                 bankTransaction.Balance = runningBalance - bankTransaction.Amount;
             }
+
+            Validate(bankTransaction);
 
             _bankTransactionRepository.Add(bankTransaction);
         }
@@ -81,6 +83,26 @@ namespace AwesomeGIC.Domain.Services
             });
 
             return bankTransactions;
+        }
+
+        private void Validate(BankTransaction bankTransaction)
+        {
+            if (string.IsNullOrEmpty(bankTransaction.AccountNumber))
+            {
+                throw new ApplicationException("Account number is required.");
+            }
+            else if (bankTransaction.Type != 'D' && bankTransaction.Type != 'W')
+            {
+                throw new ApplicationException("Transaction type must be either 'D' or 'W'.");
+            }
+            else if (bankTransaction.Amount <= 0)
+            {
+                throw new ApplicationException("Amount must be greater than zero, decimals are allowed up to 2 decimal places.");
+            }
+            else if (bankTransaction.Balance < 0)
+            {
+                throw new ApplicationException("Account balance should not be less than zero.");
+            }
         }
     }
 }

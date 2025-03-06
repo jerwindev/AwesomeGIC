@@ -70,28 +70,46 @@ static void InputTransactions(BankTransactionService bankTransactionService)
     Console.Write("> ");
 
     var input = Console.ReadLine();
-
-    if (string.IsNullOrWhiteSpace(input))
-        return;
-
     var parts = input.Split(' ');
 
-    //if (parts.Length != 4)
-    //{
-    //    Console.WriteLine("Invalid input format. Please try again.");
-    //    continue;
-    //}
-
-    var bankTransaction = new BankTransaction
+    if (parts.Length != 4)
     {
-        Date = DateTime.ParseExact(parts[0], "yyyyMMdd", null),
-        AccountNumber = parts[1],
-        Type = char.ToUpper(parts[2][0]),
-        Amount = decimal.Parse(parts[3])
-    };
+        Console.WriteLine("Invalid input format. Please try again.");
+        Console.ReadLine();
+        InputTransactions(bankTransactionService);
 
-    bankTransactionService.AddBankTransaction(bankTransaction);
-    PrintAccountStatement(bankTransactionService, bankTransaction.AccountNumber);
+        return;
+    }
+
+    try
+    {
+        var bankTransaction = new BankTransaction
+        {
+            Date = DateTime.ParseExact(parts[0], "yyyyMMdd", null),
+            AccountNumber = parts[1],
+            Type = char.ToUpper(parts[2][0]),
+            Amount = decimal.Parse(parts[3])
+        };
+
+        bankTransactionService.AddBankTransaction(bankTransaction);
+        PrintAccountStatement(bankTransactionService, bankTransaction.AccountNumber);
+    }
+    catch (FormatException formatEx)
+    {
+        Console.WriteLine("Date should be in YYYYMMdd format.");
+        Console.ReadLine();
+        InputTransactions(bankTransactionService);
+
+        return;
+    }
+    catch (ApplicationException appEx)
+    {
+        Console.WriteLine(appEx.Message);
+        Console.ReadLine();
+        InputTransactions(bankTransactionService);
+
+        return;
+    }
 }
 
 static void PrintAccountStatement(BankTransactionService bankTransactionService, string accountNumber)
@@ -112,27 +130,47 @@ static void DefineInterestRules(InterestRuleService interestRuleService)
     Console.Clear();
     Console.WriteLine("Please enter interest rules details in <Date> <RuleId> <Rate in %> format (or enter blank to go back to main menu):");
     Console.Write("> ");
+
     var input = Console.ReadLine();
-
-    if (string.IsNullOrWhiteSpace(input))
-        return;
-
     var parts = input.Split(' ');
-    //if (parts.Length != 3)
-    //{
-    //    Console.WriteLine("Invalid input format. Please try again.");
-    //    continue;
-    //}
 
-    var rule = new InterestRule
+    if (parts.Length != 3)
     {
-        Date = DateTime.ParseExact(parts[0], "yyyyMMdd", null),
-        RuleId = parts[1],
-        Rate = decimal.Parse(parts[2])
-    };
+        Console.WriteLine("Invalid input format. Please try again.");
+        Console.ReadLine();
+        DefineInterestRules(interestRuleService);
 
-    interestRuleService.AddInterestRule(rule);
-    PrintInterestRules(interestRuleService);
+        return;
+    }
+
+    try
+    {
+        var rule = new InterestRule
+        {
+            Date = DateTime.ParseExact(parts[0], "yyyyMMdd", null),
+            RuleId = parts[1],
+            Rate = decimal.Parse(parts[2])
+        };
+
+        interestRuleService.AddInterestRule(rule);
+        PrintInterestRules(interestRuleService);
+    }
+    catch (FormatException formatEx)
+    {
+        Console.WriteLine("Date should be in YYYYMMdd format.");
+        Console.ReadLine();
+        DefineInterestRules(interestRuleService);
+
+        return;
+    }
+    catch (ApplicationException appEx)
+    {
+        Console.WriteLine(appEx.Message);
+        Console.ReadLine();
+        DefineInterestRules(interestRuleService);
+
+        return;
+    }
 }
 
 static void PrintInterestRules(InterestRuleService interestRuleService)
@@ -176,6 +214,6 @@ static void PrintStatement(BankTransactionService bankTransactionService)
 
     foreach (var transaction in bankStatement)
     {
-        Console.WriteLine($"| {transaction.Date:yyyyMMdd} | {transaction.TxnId} | {transaction.Type} | {transaction.Amount:F2} | {transaction.Balance}");
+        Console.WriteLine($"| {transaction.Date:yyyyMMdd} | {transaction.TxnId.ToString().PadRight(11, ' ')} | {transaction.Type} | {transaction.Amount:F2} | {transaction.Balance}");
     }
 }
