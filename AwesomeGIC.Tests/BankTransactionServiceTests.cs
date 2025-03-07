@@ -50,7 +50,7 @@ public class BankTransactionServiceTests
     }
 
     [Fact]
-    public void AddTransaction_ShouldThrowException_WhenAccountNumberIsInvalid()
+    public void AddBankTransaction_ShouldThrowException_WhenAccountNumberIsInvalid()
     {
         // Arrange
         var transactions = new List<BankTransaction>
@@ -85,7 +85,7 @@ public class BankTransactionServiceTests
     }
 
     [Fact]
-    public void AddTransaction_ShouldThrowException_WhenTypeIsInvalid()
+    public void AddBankTransaction_ShouldThrowException_WhenTypeIsInvalid()
     {
         // Arrange
         var transactions = new List<BankTransaction>
@@ -120,7 +120,7 @@ public class BankTransactionServiceTests
     }
 
     [Fact]
-    public void AddTransaction_ShouldThrowException_WhenAmountIsInvalid()
+    public void AddBankTransaction_ShouldThrowException_WhenAmountIsInvalid()
     {
         // Arrange
         var transactions = new List<BankTransaction>
@@ -155,7 +155,7 @@ public class BankTransactionServiceTests
     }
 
     [Fact]
-    public void AddTransaction_ShouldThrowException_WhenBalanceIsInvalid()
+    public void AddBankTransaction_ShouldThrowException_WhenBalanceIsInvalid()
     {
         // Arrange
         var transactions = new List<BankTransaction>
