@@ -4,7 +4,7 @@ using AwesomeGIC.Domain.Services;
 using BankAccount.Infrastructure.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
-// Set up the DI container
+// Set up the DI container.
 
 var serviceProvider = new ServiceCollection()
     .AddSingleton<IInterestRuleRepository, InterestRuleRepository>()
@@ -13,10 +13,13 @@ var serviceProvider = new ServiceCollection()
     .AddSingleton<BankTransactionService, BankTransactionService>()
     .BuildServiceProvider();
 
+// Resolve the service.
 
-// Resolve the service and use it
 var interestRuleService = serviceProvider.GetService<InterestRuleService>();
 var bankTransactionService = serviceProvider.GetService<BankTransactionService>();
+
+// Main Menu
+
 var mainMenuFlag = true;
 
 while (true)
@@ -25,6 +28,7 @@ while (true)
     {
         Console.Clear();
         Console.WriteLine("Welcome to AwesomeGIC Bank! What would you like to do?");
+
         mainMenuFlag = false;
     }
     else
@@ -44,51 +48,68 @@ while (true)
     switch (choice)
     {
         case "T":
-            InputTransactions(bankTransactionService);
-            mainMenuFlag = false;
+            // Upon selecting Input transactions option, application prompts user for transaction details.
+            
+            mainMenuFlag = InputTransactions(bankTransactionService);
+
             break;
         case "I":
-            DefineInterestRules(interestRuleService);
+            // Upon selecting Define interest rule option, application prompts user to define interest rules.
+            
+            mainMenuFlag = DefineInterestRules(interestRuleService);
+
             break;
+
         case "P":
-            PrintStatement(bankTransactionService);
+            // Upon selecting Print statement option, application prompts user to select which account to print the statement for.
+            
+            mainMenuFlag = PrintStatement(bankTransactionService);
+
             break;
         case "Q":
+            // Upon selecting Quit option, application displays a thank you message and exits.
+
             Console.WriteLine("Thank you for banking with AwesomeGIC Bank.");
             Console.WriteLine("Have a nice day!");
+
             return;
         default:
             Console.WriteLine("Invalid choice. Please try again.");
+
             break;
     }
 }
 
-static void InputTransactions(BankTransactionService bankTransactionService)
+static bool InputTransactions(BankTransactionService bankTransactionService)
 {
     Console.Clear();
     Console.WriteLine("Please enter transaction details in <Date> <Account> <Type> <Amount> format (or enter blank to go back to main menu):");
     Console.Write("> ");
 
     var input = Console.ReadLine();
-    var parts = input.Split(' ');
 
-    if (parts.Length != 4)
+    if (string.IsNullOrWhiteSpace(input))
+        return true;
+
+    var inputValues = input.Split(' ');
+
+    if (inputValues.Length != 4)
     {
         Console.WriteLine("Invalid input format. Please try again.");
         Console.ReadLine();
         InputTransactions(bankTransactionService);
 
-        return;
+        return false;
     }
 
     try
     {
         var bankTransaction = new BankTransaction
         {
-            Date = DateTime.ParseExact(parts[0], "yyyyMMdd", null),
-            AccountNumber = parts[1],
-            Type = char.ToUpper(parts[2][0]),
-            Amount = decimal.Parse(parts[3])
+            Date = DateTime.ParseExact(inputValues[0], "yyyyMMdd", null),
+            AccountNumber = inputValues[1],
+            Type = char.ToUpper(inputValues[2][0]),
+            Amount = decimal.Parse(inputValues[3])
         };
 
         bankTransactionService.AddBankTransaction(bankTransaction);
@@ -98,18 +119,18 @@ static void InputTransactions(BankTransactionService bankTransactionService)
     {
         Console.WriteLine("Date should be in YYYYMMdd format.");
         Console.ReadLine();
-        InputTransactions(bankTransactionService);
 
-        return;
+        InputTransactions(bankTransactionService);
     }
     catch (ApplicationException appEx)
     {
         Console.WriteLine(appEx.Message);
         Console.ReadLine();
-        InputTransactions(bankTransactionService);
 
-        return;
+        InputTransactions(bankTransactionService);
     }
+
+    return false;
 }
 
 static void PrintAccountStatement(BankTransactionService bankTransactionService, string accountNumber)
@@ -117,39 +138,44 @@ static void PrintAccountStatement(BankTransactionService bankTransactionService,
     var transactions = bankTransactionService.GetBankTransactions(accountNumber);
 
     Console.WriteLine($"Account: {accountNumber}");
-    Console.WriteLine("|    Date    |   Txn Id      |      Type    |   Amount  |");
+    Console.WriteLine("| Date     | Txn Id      | Type | Amount |");
 
     foreach (var transaction in transactions)
     {
-        Console.WriteLine($"|   {transaction.Date:yyyyMMdd} |   {transaction.TxnId} |       {transaction.Type}      |   {transaction.Amount:F2} |");
+        Console.WriteLine($"| {transaction.Date.ToString("yyyyMMdd")} | {transaction.TxnId} | {transaction.Type.ToString().PadRight(4, ' ')} | {transaction.Amount.ToString("f2").PadLeft(6, ' ')} |");
     }
 }
 
-static void DefineInterestRules(InterestRuleService interestRuleService)
+static bool DefineInterestRules(InterestRuleService interestRuleService)
 {
     Console.Clear();
     Console.WriteLine("Please enter interest rules details in <Date> <RuleId> <Rate in %> format (or enter blank to go back to main menu):");
     Console.Write("> ");
 
     var input = Console.ReadLine();
-    var parts = input.Split(' ');
 
-    if (parts.Length != 3)
+    if (string.IsNullOrWhiteSpace(input))
+        return true;
+
+    var inputValues = input.Split(' ');
+
+    if (inputValues.Length != 3)
     {
         Console.WriteLine("Invalid input format. Please try again.");
         Console.ReadLine();
+
         DefineInterestRules(interestRuleService);
 
-        return;
+        return false;
     }
 
     try
     {
         var rule = new InterestRule
         {
-            Date = DateTime.ParseExact(parts[0], "yyyyMMdd", null),
-            RuleId = parts[1],
-            Rate = decimal.Parse(parts[2])
+            Date = DateTime.ParseExact(inputValues[0], "yyyyMMdd", null),
+            RuleId = inputValues[1],
+            Rate = decimal.Parse(inputValues[2])
         };
 
         interestRuleService.AddInterestRule(rule);
@@ -159,18 +185,18 @@ static void DefineInterestRules(InterestRuleService interestRuleService)
     {
         Console.WriteLine("Date should be in YYYYMMdd format.");
         Console.ReadLine();
-        DefineInterestRules(interestRuleService);
 
-        return;
+        DefineInterestRules(interestRuleService);
     }
     catch (ApplicationException appEx)
     {
         Console.WriteLine(appEx.Message);
         Console.ReadLine();
-        DefineInterestRules(interestRuleService);
 
-        return;
+        DefineInterestRules(interestRuleService);
     }
+
+    return false;
 }
 
 static void PrintInterestRules(InterestRuleService interestRuleService)
@@ -182,38 +208,45 @@ static void PrintInterestRules(InterestRuleService interestRuleService)
 
     foreach (var rule in rules)
     {
-        Console.WriteLine($"| {rule.Date:yyyyMMdd} | {rule.RuleId} | {rule.Rate:F2} |");
+        Console.WriteLine($"| {rule.Date:yyyyMMdd} | {rule.RuleId} | {rule.Rate.ToString("f2").PadLeft(8, ' ')} |");
     }
 }
 
-static void PrintStatement(BankTransactionService bankTransactionService)
+static bool PrintStatement(BankTransactionService bankTransactionService)
 {
+    Console.Clear();
     Console.WriteLine("Please enter account and month to generate the statement <Account> <Year><Month> (or enter blank to go back to main menu):");
     Console.Write("> ");
 
     var input = Console.ReadLine();
 
     if (string.IsNullOrWhiteSpace(input))
-        return;
+        return true;
 
-    var parts = input.Split(' ');
-    if (parts.Length != 2)
+    var inputValues = input.Split(' ');
+
+    if (inputValues.Length != 2)
     {
         Console.WriteLine("Invalid input format. Please try again.");
-        return;
+
+        PrintStatement(bankTransactionService);
+
+        return false;
     }
 
-    var account = parts[0];
-    var year = Convert.ToInt32(parts[1].Substring(0, 4));
-    var month = Convert.ToInt32(parts[1].Substring(4));
+    var account = inputValues[0];
+    var year = Convert.ToInt32(inputValues[1].Substring(0, 4));
+    var month = Convert.ToInt32(inputValues[1].Substring(4));
 
     var bankStatement = bankTransactionService.GetBankStatement(account, year, month);
 
     Console.WriteLine($"Account: {account}");
-    Console.WriteLine("| Date     | Txn Id      | Type | Amount |   Balance");
+    Console.WriteLine("| Date     | Txn Id      | Type | Amount | Balance |");
 
     foreach (var transaction in bankStatement)
     {
-        Console.WriteLine($"| {transaction.Date:yyyyMMdd} | {transaction.TxnId.ToString().PadRight(11, ' ')} | {transaction.Type} | {transaction.Amount:F2} | {transaction.Balance}");
+        Console.WriteLine($"| {transaction.Date:yyyyMMdd} | {transaction.TxnId.ToString().PadRight(11, ' ')} | {transaction.Type.ToString().PadRight(4, ' ')} | {transaction.Amount.ToString("f2").PadLeft(6, ' ')} | {transaction.Balance.ToString("f2").PadLeft(7, ' ')} |");
     }
+
+    return false;
 }
